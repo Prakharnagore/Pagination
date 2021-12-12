@@ -1,0 +1,69 @@
+import React, { useState, useEffect } from "react";
+import { useFetch } from "./useFetch";
+import Follower from "./Follower";
+function App() {
+  const { loading, data } = useFetch();
+  const [page, setPage] = useState(0);
+  const [followers, setFollowers] = useState([]);
+
+  useEffect(() => {
+    console.log("app useEffect called");
+    if (loading) return;
+    setFollowers(data[page]);
+  }, [data, loading, page]);
+
+  const prevPage = () => {
+    if (page === 0) {
+      setPage(data.length - 1);
+      return;
+    }
+    return setPage(page - 1);
+  };
+  const nextPage = () => {
+    if (page === data.length - 1) {
+      setPage(0);
+      return;
+    }
+    return setPage(page + 1);
+  };
+
+  console.log("render method called");
+  return (
+    <main>
+      <div className="section-title">
+        <h1>{loading ? "loading..." : "pagination"}</h1>
+        <div className="underline"></div>
+      </div>
+      <section className="followers">
+        <div className="container">
+          {followers.map((follower) => {
+            return <Follower key={follower.id} {...follower} />;
+          })}
+        </div>
+        {!loading && (
+          <div className="btn-container">
+            <button className="prev-btn" onClick={prevPage}>
+              Prev
+            </button>
+            {data.map((item, index) => {
+              return (
+                <button
+                  key={index}
+                  onClick={() => setPage(index)}
+                  className={`page-btn ${index === page ? "active-btn" : null}`}
+                >
+                  {1 + index}
+                </button>
+              );
+            })}
+            <button className="prev-btn" onClick={nextPage}>
+              Next
+            </button>
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+export default App;
